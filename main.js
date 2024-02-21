@@ -1,14 +1,18 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+
 import { Board } from './classes/chessBoard.js';
 import { Spot } from './classes/chessSpot.js';
+
+
 const renderer = new THREE.WebGLRenderer();
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-camera.position.set(0, 10, 10);
+camera.position.set(0, 5, 5);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-scene.add(controls);
+//scene.add(controls);
 const meshHelper = new THREE.GridHelper(100, 100);
 scene.add(meshHelper);
 
@@ -17,6 +21,47 @@ document.body.appendChild( renderer.domElement );
 camera.position.z = 5;
 
 const board = new Board(scene);
+
+const loader = new OBJLoader();
+loader.setPath('assets/models/');
+const customMaterial = new THREE.MeshPhongMaterial({
+    color: 0x555555,
+    specular: 0xffffff,
+    shininess: 50,
+});
+
+var fillLight = new THREE.DirectionalLight(0xffffff, 0.8);
+fillLight.position.set(50, 50, 50);
+scene.add(fillLight);
+
+loader.load(
+	// resource URL
+	'King.obj',
+	// onLoad callback
+	function ( object ) {
+		object.position.x = 0;
+		object.position.y = 0;
+		object.position.z = 0;
+		object.scale.set(0.1, 0.1, 0.1);
+
+		object.rotation.x = -Math.PI / 2;
+		object.rotation.y = 0;
+		object.rotation.z = 0;	
+		
+		const meshHelper = new THREE.BoxHelper( object, 0xffff00 );
+		console.log(object.position)
+
+	  scene.add( object , meshHelper);
+	},
+	// onProgress callback
+	function ( xhr ) {
+	  console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+	},
+	// onError callback
+	function ( error ) {
+	  console.log( 'An error happened' + error);
+	}
+  );
 
 
 function animate() {
