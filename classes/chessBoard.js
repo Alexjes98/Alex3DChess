@@ -10,19 +10,31 @@ class Board {
     }
     createBoard() {
       const board = new Array(8);
-      for (let i = 0; i < 8; i++) {
+      for (let i = -7; i < 1; i++) {
         board[i] = new Array(8);
-        for (let j = 0; j < 8; j++) {
+        for (let j = -7; j < 1; j++) {
           const geometry = new THREE.PlaneGeometry(1, 1);
           const material = new THREE.MeshBasicMaterial({ color: (i + j) % 2 === 0 ? 0xFFFFFF : 0x000000 });
           const square = new THREE.Mesh(geometry, material);
           square.rotation.x = -Math.PI / 2;
-          square.position.set(i - 3.5, 0, j - 3.5);
-          this.gameObjects.add(square);
+          square.position.set(i + 3.5, 0, j + 3.5);
+          const meshHelper = new THREE.BoxHelper(square, 0xffff00);
+          this.gameObjects.add(square, meshHelper);
           board[i][j] = new Spot(i, j, square, null);
         }
       }
       return board;
+    }
+
+    placeWhitePieces(scene) {
+
+    }
+
+    placeBlackPieces() {
+    }
+    placePiece(piece, x, y) {
+      const spot = this.board[x][y];
+      spot.occupySpot(piece);
     }
     getBoard() {
       return this.board;

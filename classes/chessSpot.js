@@ -1,7 +1,7 @@
 class Spot {
-  constructor(x, y, piece, gameObjet) {
+  constructor(x, z, piece, gameObjet) {
     this.x = x;
-    this.y = y;
+    this.z = z;
     this.piece = piece || null;
     this.gameObjet = gameObjet || null;
   }
