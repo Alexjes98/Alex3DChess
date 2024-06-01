@@ -33,8 +33,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 camera.position.z = 5;
 
-//const board = new Board(scene);
-//TODO FIX BOARD HOVER ERROR
+const board = new Board(scene);
 
 const loader = new OBJLoader();
 loader.setPath("assets/models/");
@@ -65,22 +64,22 @@ scene.add(backLight);
 
 var gamePieces = [];
 
-function createPiece(pieceId, position, color, player, gameObject) {
-  const objectHelper = new THREE.BoxHelper(gameObject, 0xffff00);
+function createPiece(pieceId, position, color, player) {
+  // const objectHelper = new THREE.BoxHelper(gameObject, 0xffff00);
   try {
     switch (pieceId) {
       case "King":
-        return new King(color, position, gameObject, player, objectHelper);
+        return new King(color, position, player);
       case "Queen":
-        return new Queen(color, position, gameObject, player, objectHelper);
+        return new Queen(color, position, player);
       case "Bishop":
-        return new Bishop(color, position, gameObject, player, objectHelper);
+        return new Bishop(color, position, player);
       case "Rook":
-        return new Rook(color, position, gameObject, player, objectHelper);
+        return new Rook(color, position, player);
       case "Knight":
-        return new Knight(color, position, gameObject, player, objectHelper);
+        return new Knight(color, position, player);
       case "Pawn":
-        return new Pawn(color, position, gameObject, player, objectHelper);
+        return new Pawn(color, position, player);
       default:
         throw new Error("Invalid piece id");
     }
@@ -102,11 +101,13 @@ function loadPiece(id, name, position, color, player, zRotation = 0) {
             child.position.set(0, 0, 0);
             child.rotation.x = -Math.PI / 2;
             child.rotation.z = zRotation;
+            child.helper = new THREE.BoxHelper(object, 0xffff00);       
+            child.gameObject = createPiece(id, position, color, player);
           }
         });
         object.scale.set(0.2, 0.2, 0.2);
         object.position.set(position[0], 0, position[1]);
-        gamePieces.push(createPiece(id, position, color, player, object));
+        gamePieces.push(object);
         resolve(object);
       },
       (xhr) => {
@@ -135,30 +136,36 @@ window.addEventListener(
 function checkIntersections() {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(scene.children);
-
   if (intersects.length > 0) {
     if (INTERSECTED != intersects[0].object) {
       // Restore previous intersected object material
-      if (INTERSECTED)
+      if (INTERSECTED){
         INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-
+      }
       // Store reference to closest object as current intersection object
       INTERSECTED = intersects[0].object;
-
       // Store color of closest object (for later restoration)
       INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-
       // Set a new color for closest object
-      INTERSECTED.material.emissive.setHex(0xff0000);
+      INTERSECTED.material.emissive.setHex(0xffffff0);
     }
   } else {
     // Restore previous intersected object material
-    if (INTERSECTED)
+    if (INTERSECTED) {
       INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-
+    }
     // Remove previous intersection object reference
     // By setting current intersection object to "nothing"
     INTERSECTED = null;
+  }
+}
+
+function onDocumentMouseDown(event) {
+  event.preventDefault();
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(scene.children);
+  if (intersects.length > 0) {
+    console.log(intersects[0].object);  
   }
 }
 
@@ -174,6 +181,7 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 window.addEventListener("resize", onWindowResize, false);
+window.addEventListener("click", onDocumentMouseDown, false);
 
 Promise.all([
   //white pieces
@@ -233,15 +241,17 @@ Promise.all([
   })
   .then(() => {
     gamePieces.forEach((piece) => {
-      scene.add(piece.getGameObject());
+      scene.add(piece);      
     });
     animate();
   });
 
+  
+
 //LIST OF TO DO'S FOR THE 3D CHESS GAME
 // // CREATE THE TABLE
 // // CREATE LIST OF SQUARES
-// ADD HOVER EFFECT TO THE SQUARES
+// // ADD HOVER EFFECT TO THE SQUARES
 // // CREATE THE CHESS PIECES
 // // ADD THE MODELS
 // // PLACE THE PIECES ON THE BOARD
