@@ -207,6 +207,25 @@ function onWindowResize() {
 window.addEventListener("resize", onWindowResize, false);
 window.addEventListener("click", onDocumentMouseDown, false);
 
+const titleElement = document.createElement("h1");
+titleElement.innerText = "Chess Board";
+titleElement.style.position = "fixed";
+titleElement.style.top = "10px";
+titleElement.style.left = "10px";
+document.body.appendChild(titleElement);
+const infoElement = document.createElement("h4");
+infoElement.innerText = "Loading 3D models...";
+infoElement.style.position = "fixed";
+infoElement.style.top = "200px";
+infoElement.style.left = "10px";
+
+document.body.appendChild(infoElement);
+
+const loadingElement = document.createElement("span");
+loadingElement.className = "loader";
+
+document.body.appendChild(loadingElement);
+
 Promise.all([
   //white pieces
   loadPiece("Rook", "WoodRook.obj", [-5.2, -1.9], whiteMaterial(), "1"),
@@ -262,10 +281,14 @@ Promise.all([
 ])
   .catch((error) => {
     console.error(error, "ERROR");
+    document.body.removeChild(loadingElement);
   })
   .then(() => {
     gamePieces.forEach((piece) => {
       scene.add(piece);      
     });
+    document.body.removeChild(loadingElement);
+    document.body.removeChild(infoElement);
+    document.body.removeChild(titleElement);
     animate();
   });
