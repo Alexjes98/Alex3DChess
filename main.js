@@ -1,8 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
-
-import { Board } from "./classes/chessBoard.js";
 import { Spot } from "./classes/chessSpot.js";
 import {
   King,
@@ -24,7 +22,7 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(0, 5, 5);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-
+controls.autoRotate = true;
 scene.add(controls);
 //const meshHelper = new THREE.GridHelper(100, 100);
 //scene.add(meshHelper);
@@ -33,7 +31,30 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 camera.position.z = 5;
 
-const board = new Board(scene);
+
+for (let i = -7; i < 1; i++) {
+  
+  for (let j = -7; j < 1; j++) {
+    const geometry = new THREE.PlaneGeometry(1, 1);
+    const material = new THREE.MeshPhysicalMaterial({
+      color: (i + j) % 2 === 0 ? 0xffffff : 0x000000, name: `(${i}, ${j}) ${(i + j) % 2 === 0 ? 'white' : 'black'}`
+    });
+    const square = new THREE.Mesh(geometry, material);
+    square.traverse(function (child) {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+        child.gameObject = new Spot(i, j);
+      }
+    });
+    square.rotation.x = -Math.PI / 2;
+    square.position.set(i + 3.5, 0, j + 3.5);
+    square.name = `(${i}, ${j})`;
+    scene.add(square);
+    const meshHelper = new THREE.BoxHelper(square, 0xffff00);
+    
+  }
+}
 
 const loader = new OBJLoader();
 loader.setPath("assets/models/");
@@ -123,6 +144,7 @@ function loadPiece(id, name, position, color, player, zRotation = 0) {
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 let INTERSECTED;
+let selectedObject;
 
 window.addEventListener(
   "mousemove",
@@ -165,13 +187,14 @@ function onDocumentMouseDown(event) {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(scene.children);
   if (intersects.length > 0) {
-    console.log(intersects[0].object);  
+    selectedObject = intersects[0].object;
   }
 }
 
 function animate() {
-  requestAnimationFrame(animate);
+  requestAnimationFrame(animate);  
   checkIntersections();
+  controls.update();
   renderer.render(scene, camera);
 }
 
@@ -180,6 +203,7 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
+
 window.addEventListener("resize", onWindowResize, false);
 window.addEventListener("click", onDocumentMouseDown, false);
 
@@ -245,37 +269,3 @@ Promise.all([
     });
     animate();
   });
-
-  
-
-//LIST OF TO DO'S FOR THE 3D CHESS GAME
-// // CREATE THE TABLE
-// // CREATE LIST OF SQUARES
-// // ADD HOVER EFFECT TO THE SQUARES
-// // CREATE THE CHESS PIECES
-// // ADD THE MODELS
-// // PLACE THE PIECES ON THE BOARD
-// CREATE THE MOVEMENTS
-// ADD THE MOVEMENTS FOR THE PIECES
-// ADD THE CAPTURE MECHANISM
-
-// CREATE THE RULES
-// CREATE THE CHECK MECHANISM
-// CREATE THE CHECKMATE MECHANISM
-// CREATE THE STALEMATE MECHANISM
-// CREATE THE EN PASSANT MECHANISM
-// CREATE THE CASTLING MECHANISM
-// CREATE THE PROMOTION MECHANISM
-
-// CREATE THE WINNING CONDITIONS
-// CREATE THE LOSING CONDITIONS
-// CREATE THE DRAW CONDITIONS
-
-// CREATE THE TURN SYSTEM
-// CREATE THE TIMER
-// CREATE THE SCORE
-// CREATE THE UI FOR THE GAME
-// ADD THE SOUND EFFECTS
-
-// CREATE THE AI (OPTIONAL)
-// MAKE THE AI DISPLAY INTERSTING MESSAGES (OPTIONAL)

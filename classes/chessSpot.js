@@ -1,15 +1,8 @@
 class Spot {
-  constructor(x, z, piece, gameObjet) {
+  constructor(x, z, ocuppied = false) {
     this.x = x;
     this.z = z;
-    this.piece = piece || null;
-    this.gameObjet = gameObjet || null;
-  }
-  occupySpot(piece) {
-    this.piece = piece;
-  }
-  releaseSpot() {
-    this.piece = null;
+    this.ocuppied = false;
   }
 }
 
