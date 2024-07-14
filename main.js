@@ -57,7 +57,7 @@ for (let i = -7; i < 1; i++) {
 }
 
 const loader = new OBJLoader();
-loader.setPath("assets/models/");
+loader.setPath("/assets/models/");
 const whiteMaterial = () => {
   return new THREE.MeshPhongMaterial({
     color: 0xffffff,
