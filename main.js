@@ -22,22 +22,26 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(0, 5, 5);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.autoRotate = true;
-scene.add(controls);
-//const meshHelper = new THREE.GridHelper(100, 100);
+// controls.autoRotate = true;
+// scene.add(controls);
+const meshHelper = new THREE.GridHelper(100, 100);
 //scene.add(meshHelper);
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 camera.position.z = 5;
 
+var selectedObject = null;
+const boardMap = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 for (let i = -7; i < 1; i++) {
-  
+  // columns
   for (let j = -7; j < 1; j++) {
+    //rows
     const geometry = new THREE.PlaneGeometry(1, 1);
     const material = new THREE.MeshPhysicalMaterial({
-      color: (i + j) % 2 === 0 ? 0xffffff : 0x000000, name: `(${i}, ${j}) ${(i + j) % 2 === 0 ? 'white' : 'black'}`
+      color: (i + j) % 2 === 0 ? 0xffffff : 0x000000,
+      name: `(${i}, ${j}) ${(i + j) % 2 === 0 ? "white" : "black"}`,
     });
     const square = new THREE.Mesh(geometry, material);
     square.traverse(function (child) {
@@ -49,10 +53,10 @@ for (let i = -7; i < 1; i++) {
     });
     square.rotation.x = -Math.PI / 2;
     square.position.set(i + 3.5, 0, j + 3.5);
-    square.name = `(${i}, ${j})`;
+    square.name = boardMap[i + 7] + (j + 8);
+    square.type = "spot";
     scene.add(square);
     const meshHelper = new THREE.BoxHelper(square, 0xffff00);
-    
   }
 }
 
@@ -109,7 +113,7 @@ function createPiece(pieceId, position, color, player) {
     throw new Error("Error creating piece");
   }
 }
-function loadPiece(id, name, position, color, player, zRotation = 0) {
+function loadPiece(id, name, position, color, player, yRotation = 0) {
   return new Promise((resolve, reject) => {
     loader.load(
       name,
@@ -118,16 +122,12 @@ function loadPiece(id, name, position, color, player, zRotation = 0) {
           if (child instanceof THREE.Mesh) {
             child.name = id + player;
             child.material = color;
-            child.scale.set(0.5, 0.5, 0.5);
-            child.position.set(0, 0, 0);
-            child.rotation.x = -Math.PI / 2;
-            child.rotation.z = zRotation;
-            child.helper = new THREE.BoxHelper(object, 0xffff00);       
+            child.helper = new THREE.BoxHelper(object, 0xffff00);
             child.gameObject = createPiece(id, position, color, player);
           }
         });
-        object.scale.set(0.2, 0.2, 0.2);
         object.position.set(position[0], 0, position[1]);
+        object.rotation.y = yRotation;
         gamePieces.push(object);
         resolve(object);
       },
@@ -144,7 +144,6 @@ function loadPiece(id, name, position, color, player, zRotation = 0) {
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 let INTERSECTED;
-let selectedObject;
 
 window.addEventListener(
   "mousemove",
@@ -161,7 +160,8 @@ function checkIntersections() {
   if (intersects.length > 0) {
     if (INTERSECTED != intersects[0].object) {
       // Restore previous intersected object material
-      if (INTERSECTED){
+      if (INTERSECTED) {
+        console.log(INTERSECTED);
         INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
       }
       // Store reference to closest object as current intersection object
@@ -184,15 +184,22 @@ function checkIntersections() {
 
 function onDocumentMouseDown(event) {
   event.preventDefault();
+  if (selectedObject != null) {
+    let toMove = INTERSECTED.position;
+    selectedObject.parent.position.set(toMove.x, toMove.y, toMove.z);
+    selectedObject = null;
+    return;
+  }
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(scene.children);
   if (intersects.length > 0) {
     selectedObject = intersects[0].object;
+    console.log(selectedObject);
   }
 }
 
 function animate() {
-  requestAnimationFrame(animate);  
+  requestAnimationFrame(animate);
   checkIntersections();
   controls.update();
   renderer.render(scene, camera);
@@ -228,56 +235,56 @@ document.body.appendChild(loadingElement);
 
 Promise.all([
   //white pieces
-  loadPiece("Rook", "WoodRook.obj", [-5.2, -1.9], whiteMaterial(), "1"),
-  loadPiece("Rook", "WoodRook.obj", [1.9, -1.9], whiteMaterial(), "1"),
-  loadPiece("Bishop", "WoodBishop.obj", [-3.2, -1.9], whiteMaterial(), "1"),
-  loadPiece("Bishop", "WoodBishop.obj", [1.8, -1.9], whiteMaterial(), "1"),
-  loadPiece("Knight", "WoodKnight.obj", [-2.6, -1.9], whiteMaterial(), "1"),
-  loadPiece("Knight", "WoodKnight.obj", [0.3, -1.9], whiteMaterial(), "1"),
-  loadPiece("Queen", "WoodQueen.obj", [0.75, -1.9], whiteMaterial(), "1"),
-  loadPiece("King", "WoodKing.obj", [-0.7, -1.9], whiteMaterial(), "1"),
+  loadPiece("Rook", "WoodRook.obj", [-3.5, -3.5], whiteMaterial(), "1"),
+  loadPiece("Rook", "WoodRook.obj", [3.5, -3.5], whiteMaterial(), "1"),
+  loadPiece("Bishop", "WoodBishop.obj", [-2.5, -3.5], whiteMaterial(), "1"),
+  loadPiece("Bishop", "WoodBishop.obj", [2.5, -3.5], whiteMaterial(), "1"),
+  loadPiece("Knight", "WoodKnight.obj", [-1.5, -3.5], whiteMaterial(), "1"),
+  loadPiece("Knight", "WoodKnight.obj", [1.5, -3.5], whiteMaterial(), "1"),
+  loadPiece("Queen", "WoodQueen.obj", [0.5, -3.5], whiteMaterial(), "1"),
+  loadPiece("King", "WoodKing.obj", [-0.5, -3.5], whiteMaterial(), "1"),
 
-  loadPiece("Pawn", "WoodPawn.obj", [-5.1, -1.3], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [-4.1, -1.3], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [-3.1, -1.3], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [-2.1, -1.3], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [-1.1, -1.3], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [-0.1, -1.3], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [0.9, -1.3], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [1.9, -1.3], whiteMaterial(), "1"),
+  loadPiece("Pawn", "WoodPawn.obj", [-3.5, -2.5], whiteMaterial(), "1"),
+  loadPiece("Pawn", "WoodPawn.obj", [-2.5, -2.5], whiteMaterial(), "1"),
+  loadPiece("Pawn", "WoodPawn.obj", [-1.5, -2.5], whiteMaterial(), "1"),
+  loadPiece("Pawn", "WoodPawn.obj", [-0.5, -2.5], whiteMaterial(), "1"),
+  loadPiece("Pawn", "WoodPawn.obj", [0.5, -2.5], whiteMaterial(), "1"),
+  loadPiece("Pawn", "WoodPawn.obj", [1.5, -2.5], whiteMaterial(), "1"),
+  loadPiece("Pawn", "WoodPawn.obj", [2.5, -2.5], whiteMaterial(), "1"),
+  loadPiece("Pawn", "WoodPawn.obj", [3.5, -2.5], whiteMaterial(), "1"),
 
   //black pieces
-  loadPiece("Rook", "WoodRook.obj", [-5.2, 5.15], blackMaterial(), "2"),
-  loadPiece("Rook", "WoodRook.obj", [1.9, 5.15], blackMaterial(), "2"),
-  loadPiece("Bishop", "WoodBishop.obj", [-3.2, 5.15], blackMaterial(), "2"),
-  loadPiece("Bishop", "WoodBishop.obj", [1.8, 5.15], blackMaterial(), "2"),
+  loadPiece("Rook", "WoodRook.obj", [-3.5, 3.5], blackMaterial(), "2"),
+  loadPiece("Rook", "WoodRook.obj", [3.5, 3.5], blackMaterial(), "2"),
+  loadPiece("Bishop", "WoodBishop.obj", [-2.5, 3.5], blackMaterial(), "2"),
+  loadPiece("Bishop", "WoodBishop.obj", [2.5, 3.5], blackMaterial(), "2"),
   loadPiece(
     "Knight",
     "WoodKnight.obj",
-    [-0.3, 1.9],
+    [-1.5, 3.5],
     blackMaterial(),
     "2",
-    Math.PI
+    -Math.PI
   ),
   loadPiece(
     "Knight",
     "WoodKnight.obj",
-    [2.7, 1.9],
+    [1.5, 3.5],
     blackMaterial(),
     "2",
-    Math.PI
+    -Math.PI
   ),
-  loadPiece("Queen", "WoodQueen.obj", [0.75, 5.15], blackMaterial(), "2"),
-  loadPiece("King", "WoodKing.obj", [-0.7, 5.15], blackMaterial(), "2"),
+  loadPiece("Queen", "WoodQueen.obj", [-0.5, 3.5], blackMaterial(), "2"),
+  loadPiece("King", "WoodKing.obj", [0.5, 3.5], blackMaterial(), "2"),
 
-  loadPiece("Pawn", "WoodPawn.obj", [-5.1, 3.6], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [-4.1, 3.6], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [-3.1, 3.6], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [-2.1, 3.6], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [-1.1, 3.6], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [-0.1, 3.6], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [0.9, 3.6], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [1.9, 3.6], blackMaterial(), "2"),
+  loadPiece("Pawn", "WoodPawn.obj", [-3.5, 2.5], blackMaterial(), "2"),
+  loadPiece("Pawn", "WoodPawn.obj", [-2.5, 2.5], blackMaterial(), "2"),
+  loadPiece("Pawn", "WoodPawn.obj", [-1.5, 2.5], blackMaterial(), "2"),
+  loadPiece("Pawn", "WoodPawn.obj", [-0.5, 2.5], blackMaterial(), "2"),
+  loadPiece("Pawn", "WoodPawn.obj", [0.5, 2.5], blackMaterial(), "2"),
+  loadPiece("Pawn", "WoodPawn.obj", [1.5, 2.5], blackMaterial(), "2"),
+  loadPiece("Pawn", "WoodPawn.obj", [2.5, 2.5], blackMaterial(), "2"),
+  loadPiece("Pawn", "WoodPawn.obj", [3.5, 2.5], blackMaterial(), "2"),
 ])
   .catch((error) => {
     console.error(error, "ERROR");
@@ -285,7 +292,7 @@ Promise.all([
   })
   .then(() => {
     gamePieces.forEach((piece) => {
-      scene.add(piece);      
+      scene.add(piece);
     });
     document.body.removeChild(loadingElement);
     document.body.removeChild(infoElement);
