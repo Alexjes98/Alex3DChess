@@ -1,0 +1,102 @@
+{
+    "a": [
+        {
+            "name": "Rook",
+            "file": "WoodRook.obj",
+            "inGamePosition": [
+                0,
+                1
+            ],
+            "positionId": "a1",
+            "material": "white",
+            "player": "white"
+        },
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                0,
+                2
+            ],
+            "positionId": "a2",
+            "material": "white",
+            "player": "white"
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    "b": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    "c": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    "d": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    "e": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    "f": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    "g": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    "h": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ]
+}

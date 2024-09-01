@@ -1,0 +1,403 @@
+{
+    "a": [
+        {
+            "name": "Rook",
+            "file": "WoodRook.obj",
+            "inGamePosition": [
+                0,
+                0
+            ],
+            "positionId": "a1",
+            "material": "white",
+            "player": "white"
+        },
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                0,
+                1
+            ],
+            "positionId": "a2",
+            "material": "white",
+            "player": "white"
+        },
+        null,
+        null,
+        null,
+        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                0,
+                6
+            ],
+            "positionId": "a7",
+            "material": "black",
+            "player": "black"
+        },
+        {
+            "name": "Rook",
+            "file": "WoodRook.obj",
+            "inGamePosition": [
+                0,
+                7
+            ],
+            "positionId": "a8",
+            "material": "black",
+            "player": "black"
+        }
+        
+    ],
+    "b": [
+        {
+            "name": "Knight",
+            "file": "WoodKnight.obj",
+            "inGamePosition": [
+                1,
+                0
+            ],
+            "positionId": "b1",
+            "material": "white",
+            "player": "white"
+        },
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                1,
+                1
+            ],
+            "positionId": "b2",
+            "material": "white",
+            "player": "white"
+        },
+        null,
+        null,
+        null,
+        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                1,
+                6
+            ],
+            "positionId": "b7",
+            "material": "black",
+            "player": "black"
+        },
+        {
+            "name": "Knight",
+            "file": "WoodKnight.obj",
+            "inGamePosition": [
+                1,
+                7
+            ],
+            "positionId": "b8",
+            "material": "black",
+            "player": "black"
+        }
+    ],
+    "c": [
+        {
+            "name": "Bishop",
+            "file": "WoodBishop.obj",
+            "inGamePosition": [
+                2,
+                0
+            ],
+            "positionId": "c1",
+            "material": "white",
+            "player": "white"
+        },
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                2,
+                1
+            ],
+            "positionId": "c2",
+            "material": "white",
+            "player": "white"
+        },
+        null,
+        null,
+        null,
+        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                2,
+                6
+            ],
+            "positionId": "c7",
+            "material": "black",
+            "player": "black"
+        },
+        {
+            "name": "Bishop",
+            "file": "WoodBishop.obj",
+            "inGamePosition": [
+                2,
+                7
+            ],
+            "positionId": "c8",
+            "material": "black",
+            "player": "black"
+        }
+    ],
+    "d": [
+        {
+            "name": "Queen",
+            "file": "WoodQueen.obj",
+            "inGamePosition": [
+                3,
+                0
+            ],
+            "positionId": "d1",
+            "material": "white",
+            "player": "white"
+        },
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                3,
+                1
+            ],
+            "positionId": "d2",
+            "material": "white",
+            "player": "white"
+        },
+        null,
+        null,
+        null,
+        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                3,
+                6
+            ],
+            "positionId": "d7",
+            "material": "black",
+            "player": "black"
+        },
+        {
+            "name": "King",
+            "file": "WoodKing.obj",
+            "inGamePosition": [
+                3,
+                7
+            ],
+            "positionId": "d8",
+            "material": "black",
+            "player": "black"
+        }
+    ],
+    "e": [
+        {
+            "name": "King",
+            "file": "WoodKing.obj",
+            "inGamePosition": [
+                4,
+                0
+            ],
+            "positionId": "e1",
+            "material": "white",
+            "player": "white"
+        },
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                4,
+                1
+            ],
+            "positionId": "e2",
+            "material": "white",
+            "player": "white"
+        },
+        null,
+        null,
+        null,
+        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                4,
+                6
+            ],
+            "positionId": "e7",
+            "material": "black",
+            "player": "black"
+        },
+        {
+            "name": "Queen",
+            "file": "WoodQueen.obj",
+            "inGamePosition": [
+                4,
+                7
+            ],
+            "positionId": "e8",
+            "material": "black",
+            "player": "black"
+        }
+    ],
+    "f": [
+        {
+            "name": "Bishop",
+            "file": "WoodBishop.obj",
+            "inGamePosition": [
+                5,
+                0
+            ],
+            "positionId": "f1",
+            "material": "white",
+            "player": "white"
+        },
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                5,
+                1
+            ],
+            "positionId": "f2",
+            "material": "white",
+            "player": "white"
+        },
+        null,
+        null,
+        null,
+        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                5,
+                6
+            ],
+            "positionId": "f7",
+            "material": "black",
+            "player": "black"
+        },
+        {
+            "name": "Bishop",
+            "file": "WoodBishop.obj",
+            "inGamePosition": [
+                5,
+                7
+            ],
+            "positionId": "f8",
+            "material": "black",
+            "player": "black"
+        }
+    ],
+    "g": [
+        {
+            "name": "Knight",
+            "file": "WoodKnight.obj",
+            "inGamePosition": [
+                6,
+                0
+            ],
+            "positionId": "g1",
+            "material": "white",
+            "player": "white"
+        },
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                6,
+                1
+            ],
+            "positionId": "g2",
+            "material": "white",
+            "player": "white"
+        },
+        null,
+        null,
+        null,
+        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                6,
+                6
+            ],
+            "positionId": "g7",
+            "material": "black",
+            "player": "black"
+        },
+        {
+            "name": "Knight",
+            "file": "WoodKnight.obj",
+            "inGamePosition": [
+                6,
+                7
+            ],
+            "positionId": "g8",
+            "material": "black",
+            "player": "black"
+        }
+    ],
+    "h": [
+        {
+            "name": "Rook",
+            "file": "WoodRook.obj",
+            "inGamePosition": [
+                7,
+                0
+            ],
+            "positionId": "h1",
+            "material": "white",
+            "player": "white"
+        },
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                7,
+                1
+            ],
+            "positionId": "h2",
+            "material": "white",
+            "player": "white"
+        },
+        null,
+        null,
+        null,
+        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                7,
+                6
+            ],
+            "positionId": "h7",
+            "material": "black",
+            "player": "black"
+        },
+        {
+            "name": "Rook",
+            "file": "WoodRook.obj",
+            "inGamePosition": [
+                7,
+                7
+            ],
+            "positionId": "h8",
+            "material": "black",
+            "player": "black"
+        }
+    ]
+}

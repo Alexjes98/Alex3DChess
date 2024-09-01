@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
-import { Spot } from "./classes/chessSpot.js";
+
 import {
   King,
   Queen,
@@ -11,57 +11,9 @@ import {
   Pawn,
 } from "./classes/chessPiece.js";
 
-const renderer = new THREE.WebGLRenderer();
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-camera.position.set(0, 5, 5);
+import GameManager from "./classes/gameManager.js";
+import boardData from "./public/board-data/boardData.json";
 
-const controls = new OrbitControls(camera, renderer.domElement);
-// controls.autoRotate = true;
-// scene.add(controls);
-const meshHelper = new THREE.GridHelper(100, 100);
-//scene.add(meshHelper);
-
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-camera.position.z = 5;
-
-var selectedObject = null;
-const boardMap = ["a", "b", "c", "d", "e", "f", "g", "h"];
-
-for (let i = -7; i < 1; i++) {
-  // columns
-  for (let j = -7; j < 1; j++) {
-    //rows
-    const geometry = new THREE.PlaneGeometry(1, 1);
-    const material = new THREE.MeshPhysicalMaterial({
-      color: (i + j) % 2 === 0 ? 0xffffff : 0x000000,
-      name: `(${i}, ${j}) ${(i + j) % 2 === 0 ? "white" : "black"}`,
-    });
-    const square = new THREE.Mesh(geometry, material);
-    square.traverse(function (child) {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-        child.gameObject = new Spot(i, j);
-      }
-    });
-    square.rotation.x = -Math.PI / 2;
-    square.position.set(i + 3.5, 0, j + 3.5);
-    square.name = boardMap[i + 7] + (j + 8);
-    square.type = "spot";
-    scene.add(square);
-    const meshHelper = new THREE.BoxHelper(square, 0xffff00);
-  }
-}
-
-const loader = new OBJLoader();
-loader.setPath("/assets/models/");
 const whiteMaterial = () => {
   return new THREE.MeshPhongMaterial({
     color: 0xffffff,
@@ -78,6 +30,97 @@ const blackMaterial = () => {
   });
 };
 
+const renderer = new THREE.WebGLRenderer();
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000
+);
+camera.position.set(5, 5, 5); // change this to 0 in x
+
+const controls = new OrbitControls(camera, renderer.domElement);
+// controls.autoRotate = true;
+// scene.add(controls);
+const meshHelper = new THREE.GridHelper(100, 100);
+//scene.add(meshHelper);
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+camera.position.z = 5;
+
+const loader = new OBJLoader();
+loader.setPath("/assets/models/");
+
+var gameManager = new GameManager();
+
+const boardMap = ["a", "b", "c", "d", "e", "f", "g", "h"];
+
+async function loadGameComponents() {
+  return new Promise(async (resolve, reject) => {
+    //3D Object generation handling
+    try {
+      for (let i = -7; i < 1; i++) {
+        // columns
+        var row = [];
+        for (let j = -7; j < 1; j++) {
+          //rows
+          const geometry = new THREE.PlaneGeometry(1, 1);
+          const material = new THREE.MeshPhysicalMaterial({
+            color: (i + j) % 2 === 0 ? 0xffffff : 0x000000,
+            name: `(${i}, ${j}) ${(i + j) % 2 === 0 ? "white" : "black"}`,
+          });
+          const square = new THREE.Mesh(geometry, material);
+          square.traverse(function (child) {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+          square.rotation.x = -Math.PI / 2;
+          square.position.set(i + 3.5, 0, j + 3.5);
+          square.name = boardMap[i + 7] + (j + 8);
+          square.type = "spot";
+          square.col = i + 7;
+          square.row = j + 7;
+          var piece;
+          const field = boardMap[i + 7]
+          const pieceToLoad = boardData[field][j+7]
+          if (pieceToLoad != undefined) {        
+            piece = await loadPiece(
+              pieceToLoad.name,
+              pieceToLoad.file,
+              [i + 3.5, j + 3.5],
+              pieceToLoad.positionId,
+              pieceToLoad.material === "white"
+                ? whiteMaterial()
+                : blackMaterial(),
+              pieceToLoad.player,
+              pieceToLoad.player === "black" ? -Math.PI : 0
+            );                        
+            scene.add(piece);
+          }
+          scene.add(square);
+          row.push({
+            id: square.name,
+            col: i + 7,
+            row: j + 7,
+            tdObject: square,
+            occupied: j === -7 || j === -6 || j === -1 || j === 0,
+            piece: piece,
+          });
+        }
+        //add references to GameManager
+        gameManager.addBoardRow(row);
+      }
+      resolve("FINISHED");
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
 var fillLight = new THREE.DirectionalLight(0xffffff, 0.8);
 fillLight.position.set(50, 50, 50);
 scene.add(fillLight);
@@ -87,24 +130,26 @@ backLight.position.set(-50, 50, -50);
 scene.add(backLight);
 // white pieces
 
-var gamePieces = [];
-
-function createPiece(pieceId, position, color, player) {
-  // const objectHelper = new THREE.BoxHelper(gameObject, 0xffff00);
+function createPiece(pieceId, positionId, color, player) {
   try {
     switch (pieceId) {
       case "King":
-        return new King(color, position, player);
+        return new King(color, positionId, player);
       case "Queen":
-        return new Queen(color, position, player);
+        return new Queen(color, player);
       case "Bishop":
-        return new Bishop(color, position, player);
+        return new Bishop(color, player);
       case "Rook":
-        return new Rook(color, position, player);
+        return new Rook(color, positionId, player, 9, [
+          [-9, 0],
+          [0, -9],
+          [9, 0],
+          [0, 9],
+        ]);
       case "Knight":
-        return new Knight(color, position, player);
+        return new Knight(color, player);
       case "Pawn":
-        return new Pawn(color, position, player);
+        return new Pawn(color, player);
       default:
         throw new Error("Invalid piece id");
     }
@@ -113,7 +158,15 @@ function createPiece(pieceId, position, color, player) {
     throw new Error("Error creating piece");
   }
 }
-function loadPiece(id, name, position, color, player, yRotation = 0) {
+function loadPiece(
+  id,
+  name,
+  position,
+  positionId,
+  color,
+  player,
+  yRotation = 0
+) {
   return new Promise((resolve, reject) => {
     loader.load(
       name,
@@ -122,13 +175,13 @@ function loadPiece(id, name, position, color, player, yRotation = 0) {
           if (child instanceof THREE.Mesh) {
             child.name = id + player;
             child.material = color;
+            child.type = "piece";
             child.helper = new THREE.BoxHelper(object, 0xffff00);
-            child.gameObject = createPiece(id, position, color, player);
+            child.gameObject = createPiece(id, positionId, color, player);
           }
         });
         object.position.set(position[0], 0, position[1]);
         object.rotation.y = yRotation;
-        gamePieces.push(object);
         resolve(object);
       },
       (xhr) => {
@@ -161,7 +214,6 @@ function checkIntersections() {
     if (INTERSECTED != intersects[0].object) {
       // Restore previous intersected object material
       if (INTERSECTED) {
-        console.log(INTERSECTED);
         INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
       }
       // Store reference to closest object as current intersection object
@@ -183,18 +235,42 @@ function checkIntersections() {
 }
 
 function onDocumentMouseDown(event) {
-  event.preventDefault();
-  if (selectedObject != null) {
-    let toMove = INTERSECTED.position;
-    selectedObject.parent.position.set(toMove.x, toMove.y, toMove.z);
-    selectedObject = null;
+  function getPieceValues(selectedPiece) {
+    var currentPosId = selectedPiece.gameObject.positionId;
+    gameManager.calculatePossibleMoves(currentPosId, selectedPiece);
     return;
   }
+  event.preventDefault();
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(scene.children);
+
+  if (gameManager.selectedObject != null && intersects.length > 0) {
+    // second click and selected piece
+    let toMove = INTERSECTED.position;
+    gameManager.selectedObject.parent.position.set(
+      toMove.x,
+      toMove.y,
+      toMove.z
+    );
+    gameManager.selectedObject = null;
+    return;
+  }
+  //first click
   if (intersects.length > 0) {
-    selectedObject = intersects[0].object;
-    console.log(selectedObject);
+    const firstInterception = intersects[0].object;
+    if (firstInterception.type !== "spot") {
+      console.log("selected", firstInterception.name, firstInterception.type);
+      gameManager.selectedObject = firstInterception;
+      getPieceValues(firstInterception);
+    } else if (firstInterception.type === "spot") {
+      console.log(
+        "position",
+        gameManager.boardMap[firstInterception.col][firstInterception.row]
+      );
+    }
+  } else {
+    gameManager.selectedObject = null;
+    console.log("no object selected");
   }
 }
 
@@ -234,66 +310,13 @@ loadingElement.className = "loader";
 document.body.appendChild(loadingElement);
 
 Promise.all([
-  //white pieces
-  loadPiece("Rook", "WoodRook.obj", [-3.5, -3.5], whiteMaterial(), "1"),
-  loadPiece("Rook", "WoodRook.obj", [3.5, -3.5], whiteMaterial(), "1"),
-  loadPiece("Bishop", "WoodBishop.obj", [-2.5, -3.5], whiteMaterial(), "1"),
-  loadPiece("Bishop", "WoodBishop.obj", [2.5, -3.5], whiteMaterial(), "1"),
-  loadPiece("Knight", "WoodKnight.obj", [-1.5, -3.5], whiteMaterial(), "1"),
-  loadPiece("Knight", "WoodKnight.obj", [1.5, -3.5], whiteMaterial(), "1"),
-  loadPiece("Queen", "WoodQueen.obj", [0.5, -3.5], whiteMaterial(), "1"),
-  loadPiece("King", "WoodKing.obj", [-0.5, -3.5], whiteMaterial(), "1"),
-
-  loadPiece("Pawn", "WoodPawn.obj", [-3.5, -2.5], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [-2.5, -2.5], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [-1.5, -2.5], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [-0.5, -2.5], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [0.5, -2.5], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [1.5, -2.5], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [2.5, -2.5], whiteMaterial(), "1"),
-  loadPiece("Pawn", "WoodPawn.obj", [3.5, -2.5], whiteMaterial(), "1"),
-
-  //black pieces
-  loadPiece("Rook", "WoodRook.obj", [-3.5, 3.5], blackMaterial(), "2"),
-  loadPiece("Rook", "WoodRook.obj", [3.5, 3.5], blackMaterial(), "2"),
-  loadPiece("Bishop", "WoodBishop.obj", [-2.5, 3.5], blackMaterial(), "2"),
-  loadPiece("Bishop", "WoodBishop.obj", [2.5, 3.5], blackMaterial(), "2"),
-  loadPiece(
-    "Knight",
-    "WoodKnight.obj",
-    [-1.5, 3.5],
-    blackMaterial(),
-    "2",
-    -Math.PI
-  ),
-  loadPiece(
-    "Knight",
-    "WoodKnight.obj",
-    [1.5, 3.5],
-    blackMaterial(),
-    "2",
-    -Math.PI
-  ),
-  loadPiece("Queen", "WoodQueen.obj", [-0.5, 3.5], blackMaterial(), "2"),
-  loadPiece("King", "WoodKing.obj", [0.5, 3.5], blackMaterial(), "2"),
-
-  loadPiece("Pawn", "WoodPawn.obj", [-3.5, 2.5], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [-2.5, 2.5], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [-1.5, 2.5], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [-0.5, 2.5], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [0.5, 2.5], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [1.5, 2.5], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [2.5, 2.5], blackMaterial(), "2"),
-  loadPiece("Pawn", "WoodPawn.obj", [3.5, 2.5], blackMaterial(), "2"),
+  loadGameComponents(),
 ])
   .catch((error) => {
     console.error(error, "ERROR");
     document.body.removeChild(loadingElement);
   })
   .then(() => {
-    gamePieces.forEach((piece) => {
-      scene.add(piece);
-    });
     document.body.removeChild(loadingElement);
     document.body.removeChild(infoElement);
     document.body.removeChild(titleElement);
