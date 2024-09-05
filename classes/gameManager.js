@@ -1,4 +1,4 @@
-import { replacePiece } from "../main.js";
+import { replacePiece, removePiece } from "../main.js";
 class Observable {
   constructor() {
     this.observers = [];
@@ -44,17 +44,24 @@ class GameManager {
   }
 
   pawnFirstMove({ col, row }) {
-    if (this.boardMap[col][row].piece.children[0].gameObject.name === "Pawn") {
-      if (this.boardMap[col][row].piece.children[0].gameObject.range === 2) {
-        console.log("Pawn first move", col, row);
-        this.boardMap[col][row].piece.children[0].gameObject.range = 1;
+    if (this.boardMap[col][row].piece) {
+      if (
+        this.boardMap[col][row].piece.children[0].gameObject.name === "Pawn"
+      ) {
+        if (this.boardMap[col][row].piece.children[0].gameObject.range === 2) {
+          this.boardMap[col][row].piece.children[0].gameObject.range = 1;
+        }
       }
     }
   }
 
+  pieceRemoved({ col, row }) {
+    console.log("Piece removed at", col, row);
+  }
+
   async pawnPromotion({ col, row }) {
     if (this.boardMap[col][row].piece.children[0].gameObject.name === "Pawn") {
-      if (row === 0 || row === 7) {        
+      if (row === 0 || row === 7) {
         const newPiece = await replacePiece(
           {
             name: "Queen", // "Knight", "Bishop", "Rook"
@@ -89,8 +96,16 @@ class GameManager {
     ) {
       this.selectedObject = null;
       this.unmarkAll();
-      console.log("Invalid move");
       return;
+    }
+    if (this.boardMap[toMove.col][toMove.row].occupied) {
+      if (
+        this.boardMap[toMove.col][toMove.row].piece.children[0].gameObject
+          .player !== this.selectedObject.gameObject.player
+      ) {
+        removePiece(toMove.col, toMove.row);
+        this.observable.notify({ col: toMove.col, row: toMove.row });
+      }
     }
 
     this.boardMap[toMove.col][toMove.row].occupied = true;
@@ -236,7 +251,6 @@ class GameManager {
         position: this.boardMap[i][j].positionId,
       };
     } else if (isEnemyPiece) {
-      console.log("enemy");
       this.boardMap[i][j].tdObject.material.emissive.setHex(0xff0000);
       return {
         occupied: this.boardMap[i][j].occupied,

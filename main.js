@@ -12,7 +12,7 @@ import {
 } from "./classes/chessPiece.js";
 
 import GameManager from "./classes/gameManager.js";
-import boardData from "./public/board-data/boardDataTest.json";
+import boardData from "./public/board-data/boardData.json";
 
 const whiteMaterial = () => {
   return new THREE.MeshPhongMaterial({
@@ -41,7 +41,7 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(5, 5, 5); // change this to 0 in x
 
 const controls = new OrbitControls(camera, renderer.domElement);
-// controls.autoRotate = true;
+controls.autoRotate = true;
 // scene.add(controls);
 const meshHelper = new THREE.GridHelper(100, 100);
 //scene.add(meshHelper);
@@ -138,6 +138,11 @@ export async function replacePiece(pieceToLoad, i, j) {
   scene.add(piece);
   scene.remove(gameManager.boardMap[i][j].piece);
   return piece;
+}
+
+export async function removePiece(i, j) {
+  console.log("removing piece",gameManager.boardMap[i][j].piece);  
+  scene.remove(gameManager.boardMap[i][j].piece);
 }
 
 var fillLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -247,15 +252,6 @@ let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 let INTERSECTED;
 
-window.addEventListener(
-  "mousemove",
-  (event) => {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  },
-  false
-);
-
 function checkIntersections() {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(scene.children);
@@ -332,6 +328,15 @@ function onWindowResize() {
 
 window.addEventListener("resize", onWindowResize, false);
 window.addEventListener("click", onDocumentMouseDown, false);
+
+window.addEventListener(
+  "mousemove",
+  (event) => {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  },
+  false
+);
 
 const titleElement = document.createElement("h1");
 titleElement.innerText = "Chess Board";
