@@ -12,29 +12,30 @@ class Piece {
 }
 
 class King extends Piece {
-  constructor(color, positionId, player) {
-    super(color, positionId, player);
+  constructor(color, positionId, player, range, movementPattern) {
+    super(color, positionId, player, range, movementPattern);
     this.name = "King";
   }
 }
 
 class Queen extends Piece {
-  constructor(color, positionId, player) {
-    super(color, positionId, player);
+  constructor(color, positionId, player, range, movementPattern) {
+    super(color, positionId, player, range, movementPattern);
     this.name = "Queen";
   }
 }
 
 class Knight extends Piece {
-  constructor(color, positionId, player) {
-    super(color, positionId, player);
+  constructor(color, positionId, player, range, movementPattern) {
+    super(color, positionId, player, range, movementPattern);
     this.name = "Knight";
   }
 }
 
 class Bishop extends Piece {
-  constructor(color, positionId, player) {
-    super(color, positionId, player);
+  constructor(color, positionId, player, range, movementPattern) {
+    super(color, positionId, player, range, movementPattern);
+
     this.name = "Bishop";
   }
 }
@@ -47,8 +48,8 @@ class Rook extends Piece {
 }
 
 class Pawn extends Piece {
-  constructor(color, positionId, player) {
-    super(color, positionId, player);
+  constructor(color, positionId, player, range, movementPattern) {
+    super(color, positionId, player, range, movementPattern);
     this.name = "Pawn";
   }
 }

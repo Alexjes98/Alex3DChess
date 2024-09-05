@@ -1,38 +1,38 @@
 {
     "a": [
-        {
-            "name": "Rook",
-            "file": "WoodRook.obj",
-            "inGamePosition": [
-                0,
-                1
-            ],
-            "positionId": "a1",
-            "material": "white",
-            "player": "white"
-        },
+        null,
+        null,
+        null,
+        null,
+        null,
         {
             "name": "Pawn",
             "file": "WoodPawn.obj",
             "inGamePosition": [
                 0,
-                2
+                5
             ],
-            "positionId": "a2",
+            "positionId": "a6",
             "material": "white",
             "player": "white"
         },
-        null,
-        null,
-        null,
-        null,
         null,
         null
     ],
     "b": [
         null,
         null,
-        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                1,
+                2
+            ],
+            "positionId": "b1",
+            "material": "black",
+            "player": "black"
+        },
         null,
         null,
         null,
@@ -53,8 +53,28 @@
         null,
         null,
         null,
-        null,
-        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                3,
+                3
+            ],
+            "positionId": "d3",
+            "material": "black",
+            "player": "black"
+        },
+        {
+            "name": "Rook",
+            "file": "WoodRook.obj",
+            "inGamePosition": [
+                3,
+                4
+            ],
+            "positionId": "a3",
+            "material": "white",
+            "player": "white"
+        },
         null,
         null,
         null

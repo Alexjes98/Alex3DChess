@@ -84,21 +84,23 @@ async function loadGameComponents() {
           square.type = "spot";
           square.col = i + 7;
           square.row = j + 7;
-          var piece;
-          const field = boardMap[i + 7]
-          const pieceToLoad = boardData[field][j+7]
-          if (pieceToLoad != undefined) {        
+          var piece = null;
+          const field = boardMap[i + 7];
+          const pieceToLoad = boardData[field][j + 7];
+          if (pieceToLoad != undefined) {
             piece = await loadPiece(
               pieceToLoad.name,
               pieceToLoad.file,
               [i + 3.5, j + 3.5],
               pieceToLoad.positionId,
+              square.col,
+              square.row,
               pieceToLoad.material === "white"
                 ? whiteMaterial()
                 : blackMaterial(),
               pieceToLoad.player,
               pieceToLoad.player === "black" ? -Math.PI : 0
-            );                        
+            );
             scene.add(piece);
           }
           scene.add(square);
@@ -107,7 +109,7 @@ async function loadGameComponents() {
             col: i + 7,
             row: j + 7,
             tdObject: square,
-            occupied: j === -7 || j === -6 || j === -1 || j === 0,
+            occupied: pieceToLoad != undefined,
             piece: piece,
           });
         }
@@ -134,22 +136,45 @@ function createPiece(pieceId, positionId, color, player) {
   try {
     switch (pieceId) {
       case "King":
-        return new King(color, positionId, player);
+        return new King(color, positionId, player, 1, [
+          "foward",
+          "back",
+          "left",
+          "right",
+          "foward-left",
+          "foward-right",
+          "back-left",
+          "back-right",
+        ]);
       case "Queen":
-        return new Queen(color, player);
+        return new Queen(color, positionId, player, 9, [
+          "foward",
+          "back",
+          "left",
+          "right",
+          "foward-left",
+          "foward-right",
+          "back-left",
+          "back-right",
+        ]);
       case "Bishop":
-        return new Bishop(color, player);
+        return new Bishop(color, positionId, player, 9, [
+          "foward-left",
+          "foward-right",
+          "back-left",
+          "back-right",
+        ]);
       case "Rook":
         return new Rook(color, positionId, player, 9, [
-          [-9, 0],
-          [0, -9],
-          [9, 0],
-          [0, 9],
+          "foward",
+          "back",
+          "left",
+          "right",
         ]);
       case "Knight":
-        return new Knight(color, player);
+        return new Knight(color, positionId, player, 1, ["knight"]);
       case "Pawn":
-        return new Pawn(color, player);
+        return new Pawn(color, positionId, player, 1, ["foward"]);
       default:
         throw new Error("Invalid piece id");
     }
@@ -158,11 +183,14 @@ function createPiece(pieceId, positionId, color, player) {
     throw new Error("Error creating piece");
   }
 }
+
 function loadPiece(
   id,
   name,
   position,
   positionId,
+  col,
+  row,
   color,
   player,
   yRotation = 0
@@ -176,6 +204,8 @@ function loadPiece(
             child.name = id + player;
             child.material = color;
             child.type = "piece";
+            child.col = col;
+            child.row = row;
             child.helper = new THREE.BoxHelper(object, 0xffff00);
             child.gameObject = createPiece(id, positionId, color, player);
           }
@@ -235,33 +265,48 @@ function checkIntersections() {
 }
 
 function onDocumentMouseDown(event) {
-  function getPieceValues(selectedPiece) {
-    var currentPosId = selectedPiece.gameObject.positionId;
-    gameManager.calculatePossibleMoves(currentPosId, selectedPiece);
-    return;
-  }
   event.preventDefault();
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(scene.children);
-
-  if (gameManager.selectedObject != null && intersects.length > 0) {
-    // second click and selected piece
-    let toMove = INTERSECTED.position;
-    gameManager.selectedObject.parent.position.set(
-      toMove.x,
-      toMove.y,
-      toMove.z
-    );
-    gameManager.selectedObject = null;
-    return;
-  }
-  //first click
   if (intersects.length > 0) {
-    const firstInterception = intersects[0].object;
+    let firstInterception = intersects[0].object;
+    if (gameManager.selectedObject != null) {
+      // second click
+      if (firstInterception.type === "spot") {
+        const position = INTERSECTED.position;
+        const toMove = INTERSECTED;
+        gameManager.selectedObject.parent.position.set(
+          position.x,
+          position.y,
+          position.z
+        );
+        console.log("moving to", toMove);
+
+        const { col, row } = gameManager.selectedObject;
+        gameManager.boardMap[toMove.col][toMove.row].occupied = true;
+        gameManager.selectedObject.col = toMove.col;
+        gameManager.selectedObject.row = toMove.row;
+        gameManager.boardMap[toMove.col][toMove.row].piece = gameManager.boardMap[col][row].piece;
+
+        gameManager.boardMap[col][row].occupied = false;
+        gameManager.boardMap[col][row].piece = null;        
+
+        setTimeout(() => {  gameManager.unmarkAll(); }, 100);
+
+        
+
+        return (gameManager.selectedObject = null);
+      } else {
+        return (gameManager.selectedObject = null);
+      }
+    }
+    //first click
+    firstInterception = intersects[0].object;
     if (firstInterception.type !== "spot") {
       console.log("selected", firstInterception.name, firstInterception.type);
       gameManager.selectedObject = firstInterception;
-      getPieceValues(firstInterception);
+      gameManager.unmarkAll();
+      gameManager.calculatePossibleMoves();
     } else if (firstInterception.type === "spot") {
       console.log(
         "position",
@@ -269,8 +314,9 @@ function onDocumentMouseDown(event) {
       );
     }
   } else {
-    gameManager.selectedObject = null;
     console.log("no object selected");
+    gameManager.unmarkAll();
+    return (gameManager.selectedObject = null);
   }
 }
 
@@ -309,9 +355,7 @@ loadingElement.className = "loader";
 
 document.body.appendChild(loadingElement);
 
-Promise.all([
-  loadGameComponents(),
-])
+Promise.all([loadGameComponents()])
   .catch((error) => {
     console.error(error, "ERROR");
     document.body.removeChild(loadingElement);
