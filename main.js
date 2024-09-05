@@ -12,7 +12,7 @@ import {
 } from "./classes/chessPiece.js";
 
 import GameManager from "./classes/gameManager.js";
-import boardData from "./public/board-data/boardData.json";
+import boardData from "./public/board-data/boardDataTest.json";
 
 const whiteMaterial = () => {
   return new THREE.MeshPhongMaterial({
@@ -123,6 +123,23 @@ async function loadGameComponents() {
   });
 }
 
+export async function replacePiece(pieceToLoad, i, j) {
+  const piece = await loadPiece(
+    pieceToLoad.name,
+    pieceToLoad.file,
+    pieceToLoad.position,
+    pieceToLoad.positionId,
+    i,
+    j,
+    pieceToLoad.material,
+    pieceToLoad.player,
+    pieceToLoad.player === "black" ? -Math.PI : 0
+  );
+  scene.add(piece);
+  scene.remove(gameManager.boardMap[i][j].piece);
+  return piece;
+}
+
 var fillLight = new THREE.DirectionalLight(0xffffff, 0.8);
 fillLight.position.set(50, 50, 50);
 scene.add(fillLight);
@@ -174,7 +191,9 @@ function createPiece(pieceId, positionId, color, player) {
       case "Knight":
         return new Knight(color, positionId, player, 1, ["knight"]);
       case "Pawn":
-        return new Pawn(color, positionId, player, 1, ["foward"]);
+        return new Pawn(color, positionId, player, 2, [
+          player === "white" ? "foward" : "back",
+        ]);
       default:
         throw new Error("Invalid piece id");
     }
@@ -257,10 +276,10 @@ function checkIntersections() {
     // Restore previous intersected object material
     if (INTERSECTED) {
       INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
+      INTERSECTED = null;
     }
     // Remove previous intersection object reference
     // By setting current intersection object to "nothing"
-    INTERSECTED = null;
   }
 }
 
@@ -273,29 +292,7 @@ function onDocumentMouseDown(event) {
     if (gameManager.selectedObject != null) {
       // second click
       if (firstInterception.type === "spot") {
-        const position = INTERSECTED.position;
-        const toMove = INTERSECTED;
-        gameManager.selectedObject.parent.position.set(
-          position.x,
-          position.y,
-          position.z
-        );
-        console.log("moving to", toMove);
-
-        const { col, row } = gameManager.selectedObject;
-        gameManager.boardMap[toMove.col][toMove.row].occupied = true;
-        gameManager.selectedObject.col = toMove.col;
-        gameManager.selectedObject.row = toMove.row;
-        gameManager.boardMap[toMove.col][toMove.row].piece = gameManager.boardMap[col][row].piece;
-
-        gameManager.boardMap[col][row].occupied = false;
-        gameManager.boardMap[col][row].piece = null;        
-
-        setTimeout(() => {  gameManager.unmarkAll(); }, 100);
-
-        
-
-        return (gameManager.selectedObject = null);
+        gameManager.movePiece(INTERSECTED);
       } else {
         return (gameManager.selectedObject = null);
       }

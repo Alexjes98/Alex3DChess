@@ -5,39 +5,39 @@
         null,
         null,
         null,
+        null,
         {
             "name": "Pawn",
             "file": "WoodPawn.obj",
             "inGamePosition": [
                 0,
-                5
+                6
             ],
-            "positionId": "a6",
+            "positionId": "a7",
             "material": "white",
             "player": "white"
         },
-        null,
         null
     ],
     "b": [
         null,
         null,
+        null,
+        null,
+        null,
+        null,
+        null,
         {
-            "name": "Pawn",
-            "file": "WoodPawn.obj",
+            "name": "Knight",
+            "file": "WoodKnight.obj",
             "inGamePosition": [
                 1,
-                2
+                7
             ],
-            "positionId": "b1",
+            "positionId": "b8",
             "material": "black",
             "player": "black"
-        },
-        null,
-        null,
-        null,
-        null,
-        null
+        }
     ],
     "c": [
         null,
@@ -60,7 +60,7 @@
                 3,
                 3
             ],
-            "positionId": "d3",
+            "positionId": "d4",
             "material": "black",
             "player": "black"
         },
@@ -71,7 +71,7 @@
                 3,
                 4
             ],
-            "positionId": "a3",
+            "positionId": "d5",
             "material": "white",
             "player": "white"
         },
@@ -80,7 +80,17 @@
         null
     ],
     "e": [
-        null,
+        {
+            "name": "King",
+            "file": "WoodKing.obj",
+            "inGamePosition": [
+                4,
+                0
+            ],
+            "positionId": "e1",
+            "material": "white",
+            "player": "white"
+        },
         null,
         null,
         null,
@@ -116,7 +126,17 @@
         null,
         null,
         null,
-        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                7,
+                6
+            ],
+            "positionId": "h7",
+            "material": "black",
+            "player": "black"
+        },
         null
     ]
 }
