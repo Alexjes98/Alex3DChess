@@ -60,26 +60,31 @@ class GameManager {
   }
 
   async pawnPromotion({ col, row }) {
-    if (this.boardMap[col][row].piece.children[0].gameObject.name === "Pawn") {
-      if (row === 0 || row === 7) {
-        const newPiece = await replacePiece(
-          {
-            name: "Queen", // "Knight", "Bishop", "Rook"
-            file: "WoodQueen.obj", // "WoodKnight.obj", "WoodBishop.obj", "WoodRook.obj"
-            position: [
-              this.boardMap[col][row].piece.position.x,
-              this.boardMap[col][row].piece.position.z,
-            ],
-            positionId: this.boardMap[col][row].positionId,
+    if (this.boardMap[col][row].piece) {
+      if (
+        this.boardMap[col][row].piece.children[0].gameObject.name === "Pawn"
+      ) {
+        if (row === 0 || row === 7) {
+          const newPiece = await replacePiece(
+            {
+              name: "Queen", // "Knight", "Bishop", "Rook"
+              file: "WoodQueen.obj", // "WoodKnight.obj", "WoodBishop.obj", "WoodRook.obj"
+              position: [
+                this.boardMap[col][row].piece.position.x,
+                this.boardMap[col][row].piece.position.z,
+              ],
+              positionId: this.boardMap[col][row].positionId,
+              col,
+              row,
+              material: this.boardMap[col][row].piece.children[0].material,
+              player:
+                this.boardMap[col][row].piece.children[0].gameObject.player,
+            },
             col,
-            row,
-            material: this.boardMap[col][row].piece.children[0].material,
-            player: this.boardMap[col][row].piece.children[0].gameObject.player,
-          },
-          col,
-          row
-        );
-        this.boardMap[col][row].piece = newPiece;
+            row
+          );
+          this.boardMap[col][row].piece = newPiece;
+        }
       }
     }
   }
@@ -231,10 +236,80 @@ class GameManager {
           if (position) moves.push(position);
         });
         break;
+      case "white-pawn":
+        for (let j = row + 1; j < 8; j++) {
+          iterations++;
+          const { occupied, position } = this.checkPawnPosition(
+            column,
+            j,
+            false
+          );
+          if (position) moves.push(position);
+          if (occupied || iterations === range) break;
+        }
+        if (row < 7 && row > 0 && column < 7 && column > 0) {
+          let leftWhite = this.checkPawnPosition(column + 1, row + 1, true);
+          if (leftWhite.occupied) {
+            moves.push(leftWhite.position);
+          }
+          let rightWhite = this.checkPawnPosition(column - 1, row + 1, true);
+          if (rightWhite.occupied) {
+            moves.push(rightWhite.position);
+          }
+        }
+        break;
+      case "black-pawn":
+        for (let j = row - 1; j > -1; j--) {
+          iterations++;
+          const { occupied, position } = this.checkPawnPosition(
+            column,
+            j,
+            false
+          );
+          if (position) moves.push(position);
+          if (occupied || iterations === range) break;
+        }
+        if (row < 7 && row > 0 && column < 7 && column > 0) {
+          let leftBlack = this.checkPawnPosition(column + 1, row - 1, true);
+          if (leftBlack.occupied) {
+            moves.push(leftBlack.position);
+          }
+          let rightBlack = this.checkPawnPosition(column - 1, row - 1, true);
+          if (rightBlack.occupied) {
+            moves.push(rightBlack.position);
+          }
+        }
+        break;
       default:
         throw new Error("Invalid pattern");
     }
     return moves;
+  }
+
+  checkPawnPosition(i, j, isAtackPosition) {
+    const isOccupied = this.boardMap[i][j].occupied;
+    const isAlliedPiece =
+      this.boardMap[i][j].piece?.children[0].gameObject.player ===
+      this.selectedObject.gameObject.player;
+    const isEnemyPiece = isOccupied && !isAlliedPiece;
+    if (!isOccupied) {
+      if (!isAtackPosition) {
+        this.boardMap[i][j].tdObject.material.emissive.setHex(0x91d994);
+        return {
+          occupied: this.boardMap[i][j].occupied,
+          position: this.boardMap[i][j].positionId,
+        };
+      }
+    } else if (isEnemyPiece) {
+      if (isAtackPosition) {
+        this.boardMap[i][j].tdObject.material.emissive.setHex(0xff0000);
+        return {
+          occupied: this.boardMap[i][j].occupied,
+          position: this.boardMap[i][j].positionId,
+        };
+      }
+    }
+    return { occupied: true, position: null };
   }
 
   checkPosition(i, j) {

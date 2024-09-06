@@ -12,7 +12,7 @@ import {
 } from "./classes/chessPiece.js";
 
 import GameManager from "./classes/gameManager.js";
-import boardData from "./public/board-data/boardData.json";
+import boardData from "./public/board-data/boardDataTest.json";
 
 const whiteMaterial = () => {
   return new THREE.MeshPhongMaterial({
@@ -41,7 +41,7 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(5, 5, 5); // change this to 0 in x
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.autoRotate = true;
+//controls.autoRotate = true;
 // scene.add(controls);
 const meshHelper = new THREE.GridHelper(100, 100);
 //scene.add(meshHelper);
@@ -141,7 +141,7 @@ export async function replacePiece(pieceToLoad, i, j) {
 }
 
 export async function removePiece(i, j) {
-  console.log("removing piece",gameManager.boardMap[i][j].piece);  
+  console.log("removing piece", gameManager.boardMap[i][j].piece);
   scene.remove(gameManager.boardMap[i][j].piece);
 }
 
@@ -196,9 +196,13 @@ function createPiece(pieceId, positionId, color, player) {
       case "Knight":
         return new Knight(color, positionId, player, 1, ["knight"]);
       case "Pawn":
-        return new Pawn(color, positionId, player, 2, [
-          player === "white" ? "foward" : "back",
-        ]);
+        return new Pawn(
+          color,
+          positionId,
+          player,
+          2,
+          player === "white" ? ["white-pawn"] : ["black-pawn"]
+        );
       default:
         throw new Error("Invalid piece id");
     }

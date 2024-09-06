@@ -6,22 +6,22 @@
         null,
         null,
         null,
-        {
-            "name": "Pawn",
-            "file": "WoodPawn.obj",
-            "inGamePosition": [
-                0,
-                6
-            ],
-            "positionId": "a7",
-            "material": "white",
-            "player": "white"
-        },
+        null,
         null
     ],
     "b": [
         null,
-        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                1,
+                1
+            ],
+            "positionId": "b2",
+            "material": "white",
+            "player": "white"
+        },
         null,
         null,
         null,
@@ -104,7 +104,17 @@
         null,
         null,
         null,
-        null,
+        {
+            "name": "Pawn",
+            "file": "WoodPawn.obj",
+            "inGamePosition": [
+                5,
+                4
+            ],
+            "positionId": "f5",
+            "material": "black",
+            "player": "black"
+        },
         null,
         null,
         null
@@ -126,17 +136,7 @@
         null,
         null,
         null,
-        {
-            "name": "Pawn",
-            "file": "WoodPawn.obj",
-            "inGamePosition": [
-                7,
-                6
-            ],
-            "positionId": "h7",
-            "material": "black",
-            "player": "black"
-        },
+        null,
         null
     ]
 }
