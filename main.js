@@ -101,6 +101,12 @@ async function loadGameComponents() {
               pieceToLoad.player,
               pieceToLoad.player === "black" ? -Math.PI : 0
             );
+            if (pieceToLoad.player === "black" && pieceToLoad.name === "King") {
+              gameManager.kingsPositions.black = [square.col, square.row];
+            }
+            if (pieceToLoad.player === "white" && pieceToLoad.name === "King") {
+              gameManager.kingsPositions.white = [square.col, square.row];
+            }
             scene.add(piece);
           }
           scene.add(square);
@@ -305,10 +311,7 @@ function onDocumentMouseDown(event) {
       gameManager.unmarkAll();
       gameManager.calculatePossibleMoves();
     } else if (firstInterception.type === "spot") {
-      console.log(
-        "position",
-        gameManager.boardMap[firstInterception.col][firstInterception.row]
-      );
+      console.log("position", firstInterception.col, firstInterception.row,gameManager.boardMap[firstInterception.col][firstInterception.row].positionId);
     }
   } else {
     console.log("no object selected");

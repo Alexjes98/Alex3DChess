@@ -23,9 +23,13 @@ class GameManager {
     this.gamePieces = gamePieces || [];
     this.boardMap = boardMap || [];
     this.possibleMoves = [];
+    this.kingsPositions = {};
+    this.maxBoardSize = 7;
+    this.checkThreat = false;
     this.observable = new Observable();
     this.observable.subscribe(this.pawnFirstMove.bind(this));
     this.observable.subscribe(this.pawnPromotion.bind(this));
+    this.observable.subscribe(this.kingsCheck.bind(this));
   }
   showBoard() {
     console.log(this.boardMap);
@@ -42,6 +46,12 @@ class GameManager {
   unmarkSpot(i, j) {
     this.boardMap[i][j].tdObject.material.emissive.setHex(0x000000);
   }
+
+  markSpot(i, j) {
+    this.boardMap[i][j].tdObject.material.emissive.setHex(0xff0000);
+  }
+
+  //observable events
 
   pawnFirstMove({ col, row }) {
     if (this.boardMap[col][row].piece) {
@@ -89,6 +99,278 @@ class GameManager {
     }
   }
 
+  kingsCheck() {
+    //white king
+    //left
+    for (
+      let i = this.kingsPositions.white[0] + 1;
+      i <= this.maxBoardSize;
+      i++
+    ) {
+      this.markSpot(i, this.kingsPositions.white[1]);
+      if (!this.boardMap[i][this.kingsPositions.white[1]].occupied) {
+        continue;
+      }
+      const piece =
+        this.boardMap[i][this.kingsPositions.white[1]].piece.children[0]
+          .gameObject;
+      console.log(piece);
+      if (piece.player === "white") {
+        break;
+      }
+      if (piece.name === "Queen" || piece.name === "Rook") {
+        this.checkThreat = true;
+        break;
+      }
+    }
+    //right
+    for (let i = this.kingsPositions.white[0] - 1; i >= 0; i--) {
+      this.markSpot(i, this.kingsPositions.white[1]);
+      if (!this.boardMap[i][this.kingsPositions.white[1]].occupied) {
+        continue;
+      }
+      const piece =
+        this.boardMap[i][this.kingsPositions.white[1]].piece.children[0]
+          .gameObject;
+      console.log(piece);
+      if (piece.player === "white") {
+        break;
+      }
+      if (piece.name === "Queen" || piece.name === "Rook") {
+        this.checkThreat = true;
+        break;
+      }
+    }
+    //foward
+    for (
+      let j = this.kingsPositions.white[1] + 1;
+      j <= this.maxBoardSize;
+      j++
+    ) {
+      this.markSpot(this.kingsPositions.white[0], j);
+      if (!this.boardMap[this.kingsPositions.white[0]][j].occupied) {
+        continue;
+      }
+      const piece =
+        this.boardMap[this.kingsPositions.white[0]][j].piece.children[0]
+          .gameObject;
+      console.log(piece);
+      if (piece.player === "white") {
+        break;
+      }
+      if (piece.name === "Queen" || piece.name === "Rook") {
+        this.checkThreat = true;
+        break;
+      }
+    }
+    // left-foward
+    for (
+      let i = this.kingsPositions.white[0] + 1,
+        j = this.kingsPositions.white[1] + 1;
+      i <= this.maxBoardSize && j <= this.maxBoardSize;
+      i++, j++
+    ) {
+      this.markSpot(i, j);
+      if (!this.boardMap[i][j].occupied) {
+        continue;
+      }
+      const piece = this.boardMap[i][j].piece.children[0].gameObject;
+      if (piece.player === "white") {
+        break;
+      }
+      if (piece.name === "Queen" || piece.name === "Bishop") {
+        this.checkThreat = true;
+        break;
+      } else if (
+        piece.name === "Pawn" &&
+        i - this.kingsPositions.white[0] === 1 &&
+        j - this.kingsPositions.white[1] === 1
+      ) {
+        this.checkThreat = true;
+      }
+    }
+    // right-foward
+    for (
+      let i = this.kingsPositions.white[0] - 1,
+        j = this.kingsPositions.white[1] + 1;
+      i >= 0 && j <= this.maxBoardSize;
+      i--, j++
+    ) {
+      this.markSpot(i, j);
+      if (!this.boardMap[i][j].occupied) {
+        continue;
+      }
+      const piece = this.boardMap[i][j].piece.children[0].gameObject;
+      if (piece.player === "white") {
+        break;
+      }
+      if (piece.name === "Queen" || piece.name === "Bishop") {
+        this.checkThreat = true;
+        break;
+      } else if (
+        piece.name === "Pawn" &&
+        this.kingsPositions.white[0] - i === 1 &&
+        j - this.kingsPositions.white[1] === 1
+      ) {
+        this.checkThreat = true;
+      }
+    }
+    //back
+    for (let j = this.kingsPositions.white[1] - 1; j >= 0; j--) {
+      this.markSpot(this.kingsPositions.white[0], j);
+
+      if (!this.boardMap[this.kingsPositions.white[0]][j].occupied) {
+        continue;
+      }
+      const piece =
+        this.boardMap[this.kingsPositions.white[0]][j].piece.children[0]
+          .gameObject;
+      console.log(piece);
+      if (piece.player === "white") {
+        break;
+      }
+      if (piece.name === "Queen" || piece.name === "Rook") {
+        this.checkThreat = true;
+        break;
+      }
+    }
+    // left-back
+    for (
+      let i = this.kingsPositions.white[0] + 1,
+        j = this.kingsPositions.white[1] - 1;
+      i <= this.maxBoardSize && j >= 0;
+      i++, j--
+    ) {
+      this.markSpot(i, j);
+      if (!this.boardMap[i][j].occupied) {
+        continue;
+      }
+      const piece = this.boardMap[i][j].piece.children[0].gameObject;
+      if (piece.player === "white") {
+        break;
+      }
+      if (piece.name === "Queen" || piece.name === "Bishop") {
+        thread = true;
+        break;
+      }
+    }
+    // right-back
+    for (
+      let i = this.kingsPositions.white[0] - 1,
+        j = this.kingsPositions.white[1] - 1;
+      i >= 0 && j >= 0;
+      i--, j--
+    ) {
+      this.markSpot(i, j);
+      if (!this.boardMap[i][j].occupied) {
+        continue;
+      }
+      const piece = this.boardMap[i][j].piece.children[0].gameObject;
+      if (piece.player === "white") {
+        break;
+      }
+      if (piece.name === "Queen" || piece.name === "Bishop") {
+        thread = true;
+        break;
+      }
+    }
+
+    const {
+      check: whiteCheck,
+      i: wi,
+      j: wj,
+    } = this.knightChecks(
+      this.kingsPositions.white[0],
+      this.kingsPositions.white[1]
+    );
+    if (whiteCheck) {
+      this.markSpot(this.kingsPositions.white[0], this.kingsPositions.white[1]);
+      console.log(
+        "Knight Check for White at",
+        this.kingsPositions.white[0],
+        this.kingsPositions.white[1],
+        "FROM",
+        wi,
+        wj
+      );
+    }
+    const {
+      check: blackCkeck,
+      i: bi,
+      j: bj,
+    } = this.knightChecks(
+      this.kingsPositions.black[0],
+      this.kingsPositions.black[1]
+    );
+    if (blackCkeck) {
+      this.markSpot(this.kingsPositions.black[0], this.kingsPositions.black[1]);
+      console.log(
+        "Knight Check for Black at",
+        this.kingsPositions.black[0],
+        this.kingsPositions.black[1],
+        "FROM",
+        bi,
+        bj
+      );
+    }
+    if (this.checkThreat) {
+      console.log(
+        "Check for white at",
+        this.kingsPositions.white[0],
+        this.kingsPositions.white[1]
+      );
+    }
+  }
+
+  //end observable events
+
+  knightChecks(col, row) {
+    const kingPlayer =
+      this.boardMap[col][row].piece.children[0].gameObject.player;
+    if (this.isEnemyKnight(col + 2, row + 1, kingPlayer)) {
+      return { check: true, i: col + 2, j: row + 1 };
+    }
+    if (this.isEnemyKnight(col + 2, row - 1, kingPlayer)) {
+      return { check: true, i: col + 2, j: row - 1 };
+    }
+    if (this.isEnemyKnight(col - 2, row + 1, kingPlayer)) {
+      return { check: true, i: col - 2, j: row + 1 };
+    }
+    if (this.isEnemyKnight(col - 2, row - 1, kingPlayer)) {
+      return { check: true, i: col - 2, j: row - 1 };
+    }
+    if (this.isEnemyKnight(col + 1, row + 2, kingPlayer)) {
+      return { check: true, i: col + 1, j: row + 2 };
+    }
+    if (this.isEnemyKnight(col + 1, row - 2, kingPlayer)) {
+      return { check: true, i: col + 1, j: row - 2 };
+    }
+    if (this.isEnemyKnight(col - 1, row + 2, kingPlayer)) {
+      return { check: true, i: col - 1, j: row + 2 };
+    }
+    if (this.isEnemyKnight(col - 1, row - 2, kingPlayer)) {
+      return { check: true, i: col - 1, j: row - 2 };
+    }
+    return { check: false, i: null, j: null };
+  }
+
+  isEnemyKnight(col, row, player) {
+    if (
+      col < this.maxBoardSize &&
+      row < this.maxBoardSize &&
+      col > 0 &&
+      row > 0
+    ) {
+      return (
+        this.boardMap[col][row].occupied &&
+        this.boardMap[col][row].piece.children[0].gameObject.name ===
+          "Knight" &&
+        this.boardMap[col][row].piece.children[0].gameObject.player !== player
+      );
+    }
+    return false;
+  }
+
   movePiece(selectedPosition) {
     const toMove = selectedPosition;
     const position = toMove.position;
@@ -121,9 +403,17 @@ class GameManager {
     this.boardMap[col][row].piece = null;
 
     this.selectedObject.parent.position.set(position.x, position.y, position.z);
-    this.observable.notify({ col: toMove.col, row: toMove.row });
     // console.log("moving to", toMove);
     this.unmarkAll();
+    const name =
+      this.boardMap[toMove.col][toMove.row].piece.children[0].gameObject.name;
+    const player =
+      this.boardMap[toMove.col][toMove.row].piece.children[0].gameObject.player;
+
+    if (name === "King") {
+      this.kingsPositions[player] = [toMove.col, toMove.row];
+    }
+    this.observable.notify({ col: toMove.col, row: toMove.row });
 
     setTimeout(() => {
       this.unmarkSpot(toMove.col, toMove.row);
@@ -247,16 +537,19 @@ class GameManager {
           if (position) moves.push(position);
           if (occupied || iterations === range) break;
         }
-        if (row < 7 && row > 0 && column < 7 && column > 0) {
+        if (column < 7) {
           let leftWhite = this.checkPawnPosition(column + 1, row + 1, true);
           if (leftWhite.occupied) {
             moves.push(leftWhite.position);
           }
+        }
+        if (column > 0) {
           let rightWhite = this.checkPawnPosition(column - 1, row + 1, true);
           if (rightWhite.occupied) {
             moves.push(rightWhite.position);
           }
         }
+
         break;
       case "black-pawn":
         for (let j = row - 1; j > -1; j--) {
@@ -269,16 +562,19 @@ class GameManager {
           if (position) moves.push(position);
           if (occupied || iterations === range) break;
         }
-        if (row < 7 && row > 0 && column < 7 && column > 0) {
-          let leftBlack = this.checkPawnPosition(column + 1, row - 1, true);
+        if (column > 0) {
+          let leftBlack = this.checkPawnPosition(column - 1, row - 1, true);
           if (leftBlack.occupied) {
             moves.push(leftBlack.position);
           }
-          let rightBlack = this.checkPawnPosition(column - 1, row - 1, true);
+        }
+        if (column < 7) {
+          let rightBlack = this.checkPawnPosition(column + 1, row - 1, true);
           if (rightBlack.occupied) {
             moves.push(rightBlack.position);
           }
         }
+
         break;
       default:
         throw new Error("Invalid pattern");

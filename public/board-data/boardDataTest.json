@@ -80,24 +80,34 @@
         null
     ],
     "e": [
+        null,
+        null,
+        null,
+        null,
+        null,
         {
             "name": "King",
             "file": "WoodKing.obj",
             "inGamePosition": [
                 4,
-                0
+                4
             ],
-            "positionId": "e1",
+            "positionId": "e5",
             "material": "white",
             "player": "white"
         },
         null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
+        {
+            "name": "Queen",
+            "file": "WoodQueen.obj",
+            "inGamePosition": [
+                4,
+                7
+            ],
+            "positionId": "e8",
+            "material": "black",
+            "player": "black"
+        }
     ],
     "f": [
         null,
@@ -124,7 +134,17 @@
         null,
         null,
         null,
-        null,
+        {
+            "name": "King",
+            "file": "WoodKing.obj",
+            "inGamePosition": [
+                6,
+                4
+            ],
+            "positionId": "g5",
+            "material": "black",
+            "player": "black"
+        },
         null,
         null,
         null
