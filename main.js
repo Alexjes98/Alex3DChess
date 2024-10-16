@@ -12,7 +12,8 @@ import {
 } from "./classes/chessPiece.js";
 
 import GameManager from "./classes/gameManager.js";
-import boardData from "./public/board-data/boardDataTest.json";
+import boardDataTest from "./public/board-data/boardDataTest.json";
+import boardData from "./public/board-data/boardData.json";
 
 const whiteMaterial = () => {
   return new THREE.MeshPhongMaterial({
@@ -86,7 +87,12 @@ async function loadGameComponents() {
           square.row = j + 7;
           var piece = null;
           const field = boardMap[i + 7];
-          const pieceToLoad = boardData[field][j + 7];
+          var pieceToLoad;
+          if (window.location.href === "http://localhost:5173/") {
+            pieceToLoad = boardDataTest[field][j + 7];
+          } else {
+            pieceToLoad = boardData[field][j + 7];
+          }
           if (pieceToLoad != undefined) {
             piece = await loadPiece(
               pieceToLoad.name,
@@ -311,7 +317,13 @@ function onDocumentMouseDown(event) {
       gameManager.unmarkAll();
       gameManager.calculatePossibleMoves();
     } else if (firstInterception.type === "spot") {
-      console.log("position", firstInterception.col, firstInterception.row,gameManager.boardMap[firstInterception.col][firstInterception.row].positionId);
+      console.log(
+        "position",
+        firstInterception.col,
+        firstInterception.row,
+        gameManager.boardMap[firstInterception.col][firstInterception.row]
+          .positionId
+      );
     }
   } else {
     console.log("no object selected");
