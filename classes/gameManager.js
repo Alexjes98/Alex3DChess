@@ -107,7 +107,7 @@ class GameManager {
       i <= this.maxBoardSize;
       i++
     ) {
-      this.markSpot(i, this.kingsPositions.white[1]);
+      //this.markSpot(i, this.kingsPositions.white[1]);
       if (!this.boardMap[i][this.kingsPositions.white[1]].occupied) {
         continue;
       }
@@ -125,7 +125,7 @@ class GameManager {
     }
     //right
     for (let i = this.kingsPositions.white[0] - 1; i >= 0; i--) {
-      this.markSpot(i, this.kingsPositions.white[1]);
+      //this.markSpot(i, this.kingsPositions.white[1]);
       if (!this.boardMap[i][this.kingsPositions.white[1]].occupied) {
         continue;
       }
@@ -147,7 +147,7 @@ class GameManager {
       j <= this.maxBoardSize;
       j++
     ) {
-      this.markSpot(this.kingsPositions.white[0], j);
+      //this.markSpot(this.kingsPositions.white[0], j);
       if (!this.boardMap[this.kingsPositions.white[0]][j].occupied) {
         continue;
       }
@@ -170,7 +170,7 @@ class GameManager {
       i <= this.maxBoardSize && j <= this.maxBoardSize;
       i++, j++
     ) {
-      this.markSpot(i, j);
+      //this.markSpot(i, j);
       if (!this.boardMap[i][j].occupied) {
         continue;
       }
@@ -196,7 +196,7 @@ class GameManager {
       i >= 0 && j <= this.maxBoardSize;
       i--, j++
     ) {
-      this.markSpot(i, j);
+      //this.markSpot(i, j);
       if (!this.boardMap[i][j].occupied) {
         continue;
       }
@@ -217,7 +217,7 @@ class GameManager {
     }
     //back
     for (let j = this.kingsPositions.white[1] - 1; j >= 0; j--) {
-      this.markSpot(this.kingsPositions.white[0], j);
+      //this.markSpot(this.kingsPositions.white[0], j);
 
       if (!this.boardMap[this.kingsPositions.white[0]][j].occupied) {
         continue;
@@ -241,7 +241,7 @@ class GameManager {
       i <= this.maxBoardSize && j >= 0;
       i++, j--
     ) {
-      this.markSpot(i, j);
+      //this.markSpot(i, j);
       if (!this.boardMap[i][j].occupied) {
         continue;
       }
@@ -261,7 +261,7 @@ class GameManager {
       i >= 0 && j >= 0;
       i--, j--
     ) {
-      this.markSpot(i, j);
+      //this.markSpot(i, j);
       if (!this.boardMap[i][j].occupied) {
         continue;
       }
@@ -284,7 +284,7 @@ class GameManager {
       this.kingsPositions.white[1]
     );
     if (whiteCheck) {
-      this.markSpot(this.kingsPositions.white[0], this.kingsPositions.white[1]);
+      //this.markSpot(this.kingsPositions.white[0], this.kingsPositions.white[1]);
       console.log(
         "Knight Check for White at",
         this.kingsPositions.white[0],
@@ -303,7 +303,7 @@ class GameManager {
       this.kingsPositions.black[1]
     );
     if (blackCkeck) {
-      this.markSpot(this.kingsPositions.black[0], this.kingsPositions.black[1]);
+      //this.markSpot(this.kingsPositions.black[0], this.kingsPositions.black[1]);
       console.log(
         "Knight Check for Black at",
         this.kingsPositions.black[0],
